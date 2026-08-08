@@ -6,8 +6,11 @@ import starlight from '@astrojs/starlight';
 export default defineConfig({
 	integrations: [
 		starlight({
-			title: 'My Docs',
-			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
+			title: 'Unofficial Nushell Documentation',
+			social: [
+				{ icon: 'github', label: 'GitHub', href: 'https://github.com/Mrfiregem/nu-docs' },
+				{ icon: 'desktop', label: 'NuShell', href: 'https://nushell.sh' }
+			],
 			sidebar: [
 				{
 					label: 'Guides',
@@ -19,6 +22,10 @@ export default defineConfig({
 				{
 					label: 'Reference',
 					items: [{ autogenerate: { directory: 'reference' } }],
+				},
+				{
+					label: 'Commands',
+					link: '/commands'
 				},
 			],
 		}),

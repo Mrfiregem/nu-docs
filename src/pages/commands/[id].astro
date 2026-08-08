@@ -1,0 +1,55 @@
+---
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import AnchorHeading from "@astrojs/starlight/components/AnchorHeading.astro";
+
+import { Aside, Code } from "@astrojs/starlight/components";
+
+import { getCollection } from "astro:content";
+
+export async function getStaticPaths() {
+    const cmds = await getCollection("commands");
+    return cmds.map((cmd) => ({
+        params: { id: cmd.id },
+        props: { cmd },
+    }));
+}
+
+const { cmd } = Astro.props;
+---
+
+<StarlightPage frontmatter={{ title: `${cmd.data.name} - Nushell Commands` }}>
+    <AnchorHeading id={cmd.data.name} level="1">{cmd.data.name}</AnchorHeading>
+
+    <p>{cmd.data.description}</p>
+
+    {
+        cmd.data.type === "plugin" && (
+            <Aside type="note" title="Plugin Command">
+                <p>
+                    This command is provided by an official Nushell plugin and
+                    will only work if you've previously run the following
+                    command with the correct plugin name:
+                </p>
+                <Code
+                    code="plugin add nu_plugin_{name}"
+                    lang="nushell"
+                    mark="nu_plugin_{name}"
+                />
+            </Aside>
+        )
+    }
+
+    {cmd.data.extra_description && <p>{cmd.data.extra_description}</p>}
+
+    <footer>
+        <p><b>Category:</b> <span>{cmd.data.category || "default"}</span></p>
+    </footer>
+</StarlightPage>
+
+<style>
+    header {
+        display: flex;
+        gap: 0.25em;
+        align-items: top;
+    }
+</style>

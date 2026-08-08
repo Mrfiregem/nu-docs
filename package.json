@@ -12,6 +12,10 @@
   "dependencies": {
     "@astrojs/starlight": "^0.41.7",
     "astro": "^7.1.6",
+    "hjson": "^3.2.2",
     "sharp": "^0.35.3"
+  },
+  "devDependencies": {
+    "@types/hjson": "^2.4.6"
   }
 }

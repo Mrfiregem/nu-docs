@@ -1,0 +1,61 @@
+---
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import AnchorHeading from "@astrojs/starlight/components/AnchorHeading.astro";
+
+import { getCollection } from "astro:content";
+
+const allCmds = await getCollection("commands");
+const sortedCmds = allCmds.sort(
+    (a, b) =>
+        a.data.category.localeCompare(b.data.category) ||
+        a.id.localeCompare(b.id),
+);
+---
+
+<StarlightPage frontmatter={{ title: "Nushell Commands" }}>
+    <dl>
+        {
+            allCmds.map((cmd, index) => {
+                const isNewCategory =
+                    cmd.data.category !== sortedCmds[index - 1]?.data.category;
+                return (
+                    <Fragment key={cmd.id}>
+                        {isNewCategory && (
+                            <AnchorHeading level="2" id={cmd.data.category}>
+                                {cmd.data.category}
+                            </AnchorHeading>
+                        )}
+                        <dt>
+                            <a href={`/commands/${cmd.id}/`}>{cmd.data.name}</a>
+                            {cmd.data.type === "plugin" && (
+                                <span class="plugin-tag">(plugin)</span>
+                            )}
+                        </dt>
+                        <dd>{cmd.data.description}</dd>
+                    </Fragment>
+                );
+            })
+        }
+    </dl>
+</StarlightPage>
+
+<style>
+    dl {
+        display: grid;
+        grid-template-columns: [header-start] max-content 1fr [header-end];
+        gap: 0.5em;
+        max-width: 100%;
+    }
+    .sl-heading-wrapper {
+        grid-column: header;
+    }
+    dt {
+        grid-column: 1;
+    }
+    dd {
+        grid-column: 2;
+    }
+    .plugin-tag::before {
+        content: " ";
+    }
+</style>
