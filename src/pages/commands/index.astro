@@ -3,6 +3,7 @@ import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import AnchorHeading from "@astrojs/starlight/components/AnchorHeading.astro";
 
 import { getCollection } from "astro:content";
+import type { MarkdownHeading } from "@astrojs/internal-helpers/markdown";
 
 const allCmds = await getCollection("commands");
 const sortedCmds = allCmds.sort(
@@ -12,7 +13,22 @@ const sortedCmds = allCmds.sort(
 );
 ---
 
-<StarlightPage frontmatter={{ title: "Nushell Commands" }}>
+<StarlightPage
+    frontmatter={{ title: "Nushell Commands" }}
+    headings={sortedCmds
+        .map((cmd) => {
+            const heading: MarkdownHeading = {
+                depth: 2,
+                slug: cmd.data.category.replaceAll(/\s+/g, "_"),
+                text: cmd.data.category,
+            };
+            return heading;
+        })
+        .filter(
+            (item, index, self) =>
+                index === self.findIndex((t) => t.slug === item.slug),
+        )}
+>
     <dl>
         {
             allCmds.map((cmd, index) => {
@@ -21,7 +37,10 @@ const sortedCmds = allCmds.sort(
                 return (
                     <Fragment key={cmd.id}>
                         {isNewCategory && (
-                            <AnchorHeading level="2" id={cmd.data.category}>
+                            <AnchorHeading
+                                level="2"
+                                id={cmd.data.category.replaceAll(/\s+/g, "_")}
+                            >
                                 {cmd.data.category}
                             </AnchorHeading>
                         )}
@@ -42,7 +61,7 @@ const sortedCmds = allCmds.sort(
 <style>
     dl {
         display: grid;
-        grid-template-columns: [header-start] max-content 1fr [header-end];
+        grid-template-columns: [header-start] min-content 1fr [header-end];
         gap: 0.5em;
         max-width: 100%;
     }
