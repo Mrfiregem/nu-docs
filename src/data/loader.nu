@@ -24,6 +24,14 @@ def 'main commands' [plugin_dir: directory = $nu_dir]: nothing -> string {
                 | str join ' '
             [$rc.name, '{flags}', $pos] | compact --empty | str join ' '
         }
+        | insert plugin_file {|cmd|
+            if $cmd.type == 'plugin' {
+                try {
+                    plugin list | where commands.name has $cmd.name
+                    | first | format pattern 'nu_plugin_{name}'
+                }
+            }
+        }
         | to json
     '#
     ^$nu.current-exe --no-config-file ...$plugin_flags --commands $command

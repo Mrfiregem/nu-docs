@@ -29,7 +29,7 @@ const { cmd } = Astro.props;
                     command with the correct plugin name:
                 </p>
                 <Code
-                    code="plugin add nu_plugin_{name}"
+                    code={`plugin add ${cmd.data.plugin_file || "nu_plugin_{name}"}`}
                     lang="nushell"
                     mark="nu_plugin_{name}"
                 />

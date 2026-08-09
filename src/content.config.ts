@@ -27,6 +27,7 @@ export const collections = {
 			category: z.string().default("default"),
 			type: z.string(),
 			sig_str: z.string(),
+			plugin_file: z.string().nullable(),
 		}),
 	})
 };
