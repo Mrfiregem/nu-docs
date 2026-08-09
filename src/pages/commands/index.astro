@@ -3,7 +3,7 @@ import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import AnchorHeading from "@astrojs/starlight/components/AnchorHeading.astro";
 
 import { getCollection } from "astro:content";
-import type { MarkdownHeading } from "@astrojs/internal-helpers/markdown";
+import type { MarkdownHeading } from "astro";
 
 const allCmds = await getCollection("commands");
 const sortedCmds = allCmds.sort(

@@ -28,6 +28,23 @@ export const collections = {
 			type: z.string(),
 			sig_str: z.string(),
 			plugin_file: z.string().nullable(),
+			in_out_types: z.array(
+				z.object({
+					input: z.string(),
+					output: z.string(),
+				})
+			),
+			flags: z.array(
+				z.object({
+					parameter_name: z.string(),
+					parameter_type: z.enum(['named', 'switch']),
+					syntax_shape: z.string().nullish(),
+					is_optional: z.boolean(),
+					short_flag: z.string().length(1).nullish(),
+					description: z.string(),
+					parameter_default: z.string().nullish(),
+				})
+			)
 		}),
 	})
 };

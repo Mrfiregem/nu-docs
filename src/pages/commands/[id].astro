@@ -5,6 +5,7 @@ import AnchorHeading from "@astrojs/starlight/components/AnchorHeading.astro";
 import { Aside, Code } from "@astrojs/starlight/components";
 
 import { getCollection } from "astro:content";
+import type { MarkdownHeading } from "astro";
 
 export async function getStaticPaths() {
     const cmds = await getCollection("commands");
@@ -15,9 +16,27 @@ export async function getStaticPaths() {
 }
 
 const { cmd } = Astro.props;
+
+const headings: MarkdownHeading[] = [
+    {
+        depth: 2,
+        slug: "signature",
+        text: "Signature",
+    },
+    {
+        depth: 3,
+        slug: "input-output",
+        text: "Input / Output Types",
+    },
+    {
+        depth: 3,
+        slug: "flags",
+        text: "Command Flags",
+    },
+];
 ---
 
-<StarlightPage frontmatter={{ title: cmd.data.name }}>
+<StarlightPage frontmatter={{ title: cmd.data.name }} headings={headings}>
     <p>{cmd.data.description}</p>
 
     {
@@ -37,21 +56,94 @@ const { cmd } = Astro.props;
         )
     }
 
-    {cmd.data.extra_description && <p>{cmd.data.extra_description}</p>}
+    {
+        cmd.data.extra_description && (
+            <>
+                <hr />
+                <div id="extra_desc">
+                    {/* Split extra description into sentences separated by newlines and punctuation */}
+                    {cmd.data.extra_description
+                        .split(/\r?\n/)
+                        .map((sentence) => (
+                            <p>{sentence}</p>
+                        ))}
+                </div>
+            </>
+        )
+    }
 
     <AnchorHeading id="signature" level="2">Signature</AnchorHeading>
 
     <Code code={cmd.data.sig_str} frame="none" />
 
+    <AnchorHeading id="input-output" level="3">
+        Input / Output Types
+    </AnchorHeading>
+
+    <div class="input-output-grid">
+        {
+            cmd.data.in_out_types.map(({ input, output }) => (
+                <div class="type-pair">
+                    <div class="input-type">{input}</div>
+                    <div class="output-type">{output}</div>
+                </div>
+            ))
+        }
+    </div>
+
+    <AnchorHeading id="flags" level="3">Command Flags</AnchorHeading>
+
+    {
+        cmd.data.flags.length > 0 ? (
+            <dl id="flag-list">
+                {cmd.data.flags.map(
+                    ({
+                        parameter_name: name,
+                        parameter_type: type,
+                        description,
+                        is_optional: opt,
+                        short_flag,
+                        syntax_shape,
+                        parameter_default: default_val,
+                    }) => {
+                        let result = name;
+                        if (short_flag) {
+                            result = `${short_flag}, ${result}`;
+                        }
+                        if (type == "named") {
+                            result += `: ${syntax_shape}`;
+                        }
+                        if (opt) {
+                            result += " (optional)";
+                        }
+                        if (default_val) {
+                            result += ` (default value: ${default_val})`;
+                        }
+                        return (
+                            <>
+                                <dt>{result}</dt>
+                                <dd>{description}</dd>
+                            </>
+                        );
+                    },
+                )}
+            </dl>
+        ) : (
+            <p>This command does not have any flags defined.</p>
+        )
+    }
+
     <hr />
     <footer>
         {
-            (cmd.data.search_terms && (
+            cmd.data.search_terms ? (
                 <p>
                     <b>Search Terms:</b>&nbsp;
                     <span>{cmd.data.search_terms}</span>
                 </p>
-            )) || <p>No search terms provided.</p>
+            ) : (
+                <p>No search terms provided.</p>
+            )
         }
         <p>
             <b>Category:</b>&nbsp;
@@ -63,14 +155,31 @@ const { cmd } = Astro.props;
 </StarlightPage>
 
 <style>
+    .input-output-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(min-content, 1fr));
+    }
+    .type-pair {
+        display: flex;
+        margin-top: 0;
+        &::before {
+            content: "• ";
+            margin-inline-end: 0.33em;
+        }
+        & > .input-type::after {
+            content: "\1F852";
+            margin-inline: 0.5em;
+        }
+    }
+    .type-pair > *,
+    footer > * {
+        /* Set by Astro for some reason */
+        margin-top: 0;
+    }
     footer {
         display: flex;
         align-items: baseline;
         gap: 2em;
         flex-wrap: wrap;
-        & > * {
-            /* Set by Astro for some reason */
-            margin-top: auto;
-        }
     }
 </style>

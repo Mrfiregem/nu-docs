@@ -13,16 +13,16 @@ def 'main commands' [plugin_dir: directory = $nu_dir]: nothing -> string {
     let plugin_flags = $plugins | each --flatten {|p| [$plugin_dir, $p] | path join | prepend '--plugins' }
     let command = r#'
         scope commands
-        | insert id {|rc| $rc.name | str replace -ra '\s+' '_' }
-        | insert sig_str {|rc|
-            let pos = $rc.signatures
+        | insert id {|cmd| $cmd.name | str replace -ra '\s+' '_' }
+        | insert sig_str {|cmd|
+            let pos = $cmd.signatures
                 | values | first
                 | each {|p| match $p.parameter_type {
                     'positional' => { format pattern '({parameter_name})' }
                     'rest' => '...rest'
                 }}
                 | str join ' '
-            [$rc.name, '{flags}', $pos] | compact --empty | str join ' '
+            [$cmd.name, '{flags}', $pos] | compact --empty | str join ' '
         }
         | insert plugin_file {|cmd|
             if $cmd.type == 'plugin' {
@@ -31,6 +31,18 @@ def 'main commands' [plugin_dir: directory = $nu_dir]: nothing -> string {
                     | first | format pattern 'nu_plugin_{name}'
                 }
             }
+        }
+        | insert in_out_types {|cmd|
+            $cmd.signatures
+            | values
+            | each {
+                where parameter_type in [input, output]
+                | select parameter_type syntax_shape
+                | transpose -rd
+            }
+        }
+        | insert flags {|cmd|
+            $cmd.signatures | values | first | where parameter_type in [named, switch]
         }
         | to json
     '#
