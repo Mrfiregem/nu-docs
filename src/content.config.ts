@@ -26,6 +26,7 @@ export const collections = {
 			search_terms: z.string(),
 			category: z.string().default("default"),
 			type: z.string(),
+			sig_str: z.string(),
 		}),
 	})
 };
