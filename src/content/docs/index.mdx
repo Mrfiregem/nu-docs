@@ -1,17 +1,17 @@
 ---
-title: Welcome to Starlight
+title: NuShell
 description: Get started building your docs site with Starlight.
-# template: splash # Remove or comment out this line to display the site sidebar on this page.
+template: splash
 hero:
-  tagline: Congrats on setting up a new Starlight project!
+  tagline: A new type of shell.
   image:
-    file: ../../assets/houston.webp
+    file: ../../assets/nushell-icon-tilted.png
   actions:
-    - text: Example Guide
+    - text: Getting Started
       link: /guides/example/
       icon: right-arrow
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
+    - text: Go to official documentation
+      link: https://nushell.sh
       icon: external
       variant: minimal
 ---
@@ -20,21 +20,21 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 ## Next steps
 
-<CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
+<CardGrid>
+	<Card title="View Commands" icon="list-format">
+        Visit the [Commands Page](/commands) To see a full list of commands provided by NuShell and its base plugins.
 	</Card>
-	<Card title="Change page layout" icon="document">
-		Delete `template: splash` in `src/content/docs/index.mdx` to display a
-		sidebar on this page.
+	<Card title="Technical Documentation" icon="document">
+		To view more in-depth topics than mentioned in the user guide, browse our [reference pages](/reference).
 	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
+	<Card title="Get in Touch" icon="discord">
+		Looking to talk about Nu or need help with a script?
+        You can talk to fellow NuShell users on our [Discord server](https://discord.gg/NtAbbGn)
+        or in [GitHub Discussions](https://github.com/nushell/nushell/discussions)!
 	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
+	<Card title="See Something Wrong?" icon="code-branch">
+		If a guide or resource doesn't match up with Nu's actual behavior,
+        [let us know](https://github.com/Mrfiregem/nu-docs/issues)! Or if you have something you want to add,
+        [send us a PR](https://github.com/Mrfiregem/nu-docs/pulls) with your change.
 	</Card>
 </CardGrid>
