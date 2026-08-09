@@ -80,17 +80,17 @@ const headings: MarkdownHeading[] = [
         Input / Output Types
     </AnchorHeading>
 
-    <ul class="input-output-list">
+    <div class="input-output-list not-content">
         {
             cmd.data.in_out_types.map(({ input, output }) => (
                 <>
-                    <span class="input">{input}</span>
-                    <span class="eq">&#x1F852;</span>
-                    <span class="output">{output}</span>
+                    <div class="input">{input}</div>
+                    <div class="eq">&#x1F852;</div>
+                    <div class="output">{output}</div>
                 </>
             ))
         }
-    </ul>
+    </div>
 
     <AnchorHeading id="flags" level="3">Command Flags</AnchorHeading>
 
@@ -158,7 +158,7 @@ const headings: MarkdownHeading[] = [
 <style>
     .input-output-list {
         display: grid;
-        grid-template-columns: max-content auto 1fr;
+        grid-template-columns: repeat(2, max-content auto 1fr);
         gap: 0 2ch;
         .input::before {
             content: "\2022 ";
@@ -171,11 +171,5 @@ const headings: MarkdownHeading[] = [
         align-items: baseline;
         gap: 2em;
         flex-wrap: wrap;
-    }
-
-    .type-pair > *,
-    footer > * {
-        /* Set by Astro for some reason */
-        margin-top: 0;
     }
 </style>
