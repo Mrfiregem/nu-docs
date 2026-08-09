@@ -17,9 +17,7 @@ export async function getStaticPaths() {
 const { cmd } = Astro.props;
 ---
 
-<StarlightPage frontmatter={{ title: `${cmd.data.name} - Nushell Commands` }}>
-    <AnchorHeading id={cmd.data.name} level="1">{cmd.data.name}</AnchorHeading>
-
+<StarlightPage frontmatter={{ title: cmd.data.name }}>
     <p>{cmd.data.description}</p>
 
     {
@@ -41,15 +39,36 @@ const { cmd } = Astro.props;
 
     {cmd.data.extra_description && <p>{cmd.data.extra_description}</p>}
 
+    <AnchorHeading id="signature" level="2">Signature</AnchorHeading>
+
+    <hr />
     <footer>
-        <p><b>Category:</b> <span>{cmd.data.category || "default"}</span></p>
+        {
+            (cmd.data.search_terms && (
+                <p>
+                    <b>Search Terms:</b>&nbsp;
+                    <span>{cmd.data.search_terms}</span>
+                </p>
+            )) || <p>No search terms provided.</p>
+        }
+        <p>
+            <b>Category:</b>&nbsp;
+            <a href={`/commands/#${cmd.data.category}`}>
+                {cmd.data.category}
+            </a>
+        </p>
     </footer>
 </StarlightPage>
 
 <style>
-    header {
+    footer {
         display: flex;
-        gap: 0.25em;
-        align-items: top;
+        align-items: baseline;
+        gap: 2em;
+        flex-wrap: wrap;
+        & > * {
+            /* Set by Astro for some reason */
+            margin-top: auto;
+        }
     }
 </style>

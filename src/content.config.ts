@@ -6,6 +6,7 @@ import { file } from 'astro/loaders';
 
 import { execSync } from "node:child_process";
 import { parse } from 'hjson';
+import { z } from 'astro/zod';
 
 export const collections = {
 	docs: defineCollection({ loader: docsLoader(), schema: docsSchema() }),
@@ -17,5 +18,14 @@ export const collections = {
 			const data = parse(output);
 			return data;
 		},
+		schema: z.object({
+			id: z.string(),
+			name: z.string(),
+			description: z.string(),
+			extra_description: z.string(),
+			search_terms: z.string(),
+			category: z.string().default("default"),
+			type: z.string(),
+		}),
 	})
 };
