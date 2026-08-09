@@ -26,7 +26,7 @@ export default defineConfig({
 				},
 				{
 					label: 'Commands',
-					link: '/nu-docs/commands'
+					link: 'commands'
 				},
 			],
 			editLink: { baseUrl: 'https://github.com/Mrfiregem/nu-docs/edit/main/' }
