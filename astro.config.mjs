@@ -4,19 +4,20 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
+	site: 'https://MrFiregem.github.io',
+	base: '/nu-docs',
 	integrations: [
 		starlight({
 			title: 'Unofficial Nushell Documentation',
 			social: [
-				{ icon: 'github', label: 'GitHub', href: 'https://github.com/Mrfiregem/nu-docs' },
-				{ icon: 'desktop', label: 'NuShell', href: 'https://nushell.sh' }
+				{ icon: 'github', label: 'Source Code', href: 'https://github.com/Mrfiregem/nu-docs' },
 			],
 			sidebar: [
 				{
 					label: 'Guides',
 					items: [
 						// Each item here is one entry in the navigation menu.
-						{ label: 'Example Guide', slug: 'guides/example' },
+						{ label: 'Getting Started', slug: 'guides/getting-started' },
 					],
 				},
 				{
@@ -25,9 +26,10 @@ export default defineConfig({
 				},
 				{
 					label: 'Commands',
-					link: '/commands'
+					link: '/nu-docs/commands'
 				},
 			],
+			editLink: { baseUrl: 'https://github.com/Mrfiregem/nu-docs/edit/main/' }
 		}),
 	],
 });
