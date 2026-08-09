@@ -4,6 +4,7 @@ import AnchorHeading from "@astrojs/starlight/components/AnchorHeading.astro";
 
 import { getCollection } from "astro:content";
 import type { MarkdownHeading } from "astro";
+import { Aside } from "@astrojs/starlight/components";
 
 const allCmds = await getCollection("commands");
 const sortedCmds = allCmds.sort(
@@ -29,7 +30,13 @@ const sortedCmds = allCmds.sort(
                 index === self.findIndex((t) => t.slug === item.slug),
         )}
 >
-    <dl>
+    <Aside title="Plugin commands" type="tip" icon="information">
+        Commands annotated with a (&dagger;) require a plugin to be installed to
+        use them. Go to their command page and look for a box like this to see
+        which plugin is required to use that command.
+    </Aside>
+
+    <dl class="not-content">
         {
             allCmds.map((cmd, index) => {
                 const isNewCategory =
@@ -45,9 +52,13 @@ const sortedCmds = allCmds.sort(
                             </AnchorHeading>
                         )}
                         <dt>
-                            <a href={`/commands/${cmd.id}/`}>{cmd.data.name}</a>
+                            <a href={`/nu-docs/commands/${cmd.id}/`}>
+                                {cmd.data.name}
+                            </a>
                             {cmd.data.type === "plugin" && (
-                                <span class="plugin-tag">(plugin)</span>
+                                <sup title="This command requires a plugin to be installed">
+                                    &dagger;
+                                </sup>
                             )}
                         </dt>
                         <dd>{cmd.data.description}</dd>
@@ -61,20 +72,18 @@ const sortedCmds = allCmds.sort(
 <style>
     dl {
         display: grid;
-        grid-template-columns: [header-start] min-content 1fr [header-end];
-        gap: 0.5em;
+        grid-template-columns: [header-start] max-content 1fr [header-end];
+        gap: 0.5em 2ch;
         max-width: 100%;
-    }
-    .sl-heading-wrapper {
-        grid-column: header;
-    }
-    dt {
-        grid-column: 1;
-    }
-    dd {
-        grid-column: 2;
-    }
-    .plugin-tag::before {
-        content: " ";
+
+        .sl-heading-wrapper {
+            grid-column: header;
+        }
+        dt {
+            grid-column: 1;
+        }
+        dd {
+            grid-column: 2;
+        }
     }
 </style>
