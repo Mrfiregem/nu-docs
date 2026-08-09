@@ -80,16 +80,17 @@ const headings: MarkdownHeading[] = [
         Input / Output Types
     </AnchorHeading>
 
-    <div class="input-output-grid">
+    <ul class="input-output-list">
         {
             cmd.data.in_out_types.map(({ input, output }) => (
-                <div class="type-pair">
-                    <div class="input-type">{input}</div>
-                    <div class="output-type">{output}</div>
-                </div>
+                <>
+                    <span class="input">{input}</span>
+                    <span class="eq">&#x1F852;</span>
+                    <span class="output">{output}</span>
+                </>
             ))
         }
-    </div>
+    </ul>
 
     <AnchorHeading id="flags" level="3">Command Flags</AnchorHeading>
 
@@ -121,8 +122,8 @@ const headings: MarkdownHeading[] = [
                         }
                         return (
                             <>
-                                <dt>{result}</dt>
-                                <dd>{description}</dd>
+                                <dt class="flag-key">{result}</dt>
+                                <dd class="flag-val">{description}</dd>
                             </>
                         );
                     },
@@ -155,31 +156,26 @@ const headings: MarkdownHeading[] = [
 </StarlightPage>
 
 <style>
-    .input-output-grid {
+    .input-output-list {
         display: grid;
-        grid-template-columns: repeat(2, minmax(min-content, 1fr));
-    }
-    .type-pair {
-        display: flex;
-        margin-top: 0;
-        &::before {
-            content: "• ";
-            margin-inline-end: 0.33em;
-        }
-        & > .input-type::after {
-            content: "\1F852";
-            margin-inline: 0.5em;
+        grid-template-columns: max-content auto 1fr;
+        gap: 0 2ch;
+        .input::before {
+            content: "\2022 ";
+            margin-inline-end: 1ch;
         }
     }
-    .type-pair > *,
-    footer > * {
-        /* Set by Astro for some reason */
-        margin-top: 0;
-    }
+
     footer {
         display: flex;
         align-items: baseline;
         gap: 2em;
         flex-wrap: wrap;
+    }
+
+    .type-pair > *,
+    footer > * {
+        /* Set by Astro for some reason */
+        margin-top: 0;
     }
 </style>
