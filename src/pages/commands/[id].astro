@@ -106,9 +106,9 @@ const headings: MarkdownHeading[] = [
                         syntax_shape,
                         parameter_default: default_val,
                     }) => {
-                        let result = name;
+                        let result = `--${name}`;
                         if (short_flag) {
-                            result = `${short_flag}, ${result}`;
+                            result = `-${short_flag}, ${result}`;
                         }
                         if (type == "named") {
                             result += `: ${syntax_shape}`;
