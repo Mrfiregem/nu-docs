@@ -4,10 +4,9 @@ import linkifyHtml from "linkify-html";
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import AnchorHeading from "@astrojs/starlight/components/AnchorHeading.astro";
 
-import { Aside, Code } from "@astrojs/starlight/components";
+import { Aside, Badge, Code } from "@astrojs/starlight/components";
 
 import { getCollection } from "astro:content";
-import type { MarkdownHeading } from "astro";
 
 export async function getStaticPaths() {
     const cmds = await getCollection("commands");
@@ -20,7 +19,7 @@ export async function getStaticPaths() {
 const { cmd } = Astro.props;
 const categorySlug = cmd.data.category.replaceAll(/\s+/g, "_");
 
-const headings: MarkdownHeading[] = [
+const headings = [
     {
         depth: 2,
         slug: "signature",
@@ -117,15 +116,24 @@ const headings: MarkdownHeading[] = [
                         if (type == "named") {
                             result += `: ${syntax_shape}`;
                         }
-                        if (opt) {
-                            result += " (optional)";
-                        }
                         if (default_val) {
-                            result += ` (default value: ${default_val})`;
+                            result += ` = ${default_val}`;
                         }
                         return (
                             <>
-                                <dt class="flag-key">{result}</dt>
+                                <dt class="flag-key">
+                                    {result}
+                                    {opt && syntax_shape ? (
+                                        <Badge text="Optional" variant="note" />
+                                    ) : (
+                                        opt && (
+                                            <Badge
+                                                text="Switch"
+                                                variant="note"
+                                            />
+                                        )
+                                    )}
+                                </dt>
                                 <dd class="flag-val">{description}</dd>
                             </>
                         );
@@ -176,10 +184,16 @@ const headings: MarkdownHeading[] = [
         }
     }
 
+    .flag-key {
+        display: flex;
+        gap: 1ch;
+        align-items: baseline;
+    }
+
     footer {
         display: flex;
         align-items: baseline;
-        gap: 2em;
+        column-gap: 2em;
         flex-wrap: wrap;
     }
 </style>
