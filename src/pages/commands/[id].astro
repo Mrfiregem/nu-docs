@@ -42,6 +42,16 @@ const headings = [
 <StarlightPage frontmatter={{ title: cmd.data.name }} headings={headings}>
     <p>{cmd.data.description}</p>
 
+    {console.log({ deprecated: cmd.data.deprecated })}
+
+    {
+        cmd.data.deprecated && (
+            <Aside type="danger" title="Deprecated Command">
+                This command will stop working in a future version of Nushell.
+            </Aside>
+        )
+    }
+
     {
         cmd.data.type === "plugin" && (
             <Aside type="note" title="Plugin Command">
