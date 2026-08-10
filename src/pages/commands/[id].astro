@@ -1,4 +1,6 @@
 ---
+import linkifyHtml from "linkify-html";
+
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import AnchorHeading from "@astrojs/starlight/components/AnchorHeading.astro";
 
@@ -65,7 +67,7 @@ const headings: MarkdownHeading[] = [
                     {cmd.data.extra_description
                         .split(/\r?\n/)
                         .map((sentence) => (
-                            <p>{sentence}</p>
+                            <p set:html={linkifyHtml(sentence)} />
                         ))}
                 </div>
             </>
