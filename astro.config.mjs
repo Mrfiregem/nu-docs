@@ -29,7 +29,8 @@ export default defineConfig({
 					link: 'commands'
 				},
 			],
-			editLink: { baseUrl: 'https://github.com/Mrfiregem/nu-docs/edit/main/' }
+			editLink: { baseUrl: 'https://github.com/Mrfiregem/nu-docs/edit/main/' },
+			customCss: ['./src/styles/add-containers.css'],
 		}),
 	],
 });

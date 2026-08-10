@@ -36,7 +36,7 @@ const sortedCmds = allCmds.sort(
         which plugin is required to use that command.
     </Aside>
 
-    <dl class="not-content">
+    <dl id="command-list" class="not-content">
         {
             allCmds.map((cmd, index) => {
                 const isNewCategory =
@@ -70,20 +70,32 @@ const sortedCmds = allCmds.sort(
 </StarlightPage>
 
 <style>
-    dl {
-        display: grid;
-        grid-template-columns: [header-start] max-content 1fr [header-end];
-        gap: 0.5em 2ch;
-        max-width: 100%;
-
-        .sl-heading-wrapper {
-            grid-column: header;
-        }
+    /* Show description below command name if there's not room */
+    @container --sl-container (width <= 640px) {
         dt {
-            grid-column: 1;
+            margin-block-start: 1em;
         }
         dd {
-            grid-column: 2;
+            margin-inline-start: 3ch;
+        }
+    }
+    /* Otherwise, show them both on the same row, aligned */
+    @container --sl-container (width > 640px) {
+        #command-list {
+            display: grid;
+            grid-template-columns: [header-start] max-content 1fr [header-end];
+            gap: 0.5em 2ch;
+            max-width: 100%;
+
+            .sl-heading-wrapper {
+                grid-column: header;
+            }
+            dt {
+                grid-column: 1;
+            }
+            dd {
+                grid-column: 2;
+            }
         }
     }
 </style>

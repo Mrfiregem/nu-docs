@@ -160,12 +160,19 @@ const headings: MarkdownHeading[] = [
 
 <style>
     .input-output-list {
+        --columns: 1;
         display: grid;
-        grid-template-columns: repeat(2, max-content auto 1fr);
+        grid-template-columns: repeat(var(--columns), max-content auto 1fr);
         gap: 0 2ch;
         .input::before {
             content: "\2022 ";
             margin-inline-end: 1ch;
+        }
+    }
+
+    @container --sl-container (width > 480) {
+        .input-output-list {
+            --columns: 2;
         }
     }
 
