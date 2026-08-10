@@ -2,10 +2,8 @@ import { defineCollection } from 'astro:content';
 import { docsLoader } from '@astrojs/starlight/loaders';
 import { docsSchema } from '@astrojs/starlight/schema';
 
-import { file } from 'astro/loaders';
-
 import { execSync } from "node:child_process";
-import { parse } from 'hjson';
+import { parse as parse_json } from 'hjson';
 import { z } from 'astro/zod';
 
 export const collections = {
@@ -15,7 +13,7 @@ export const collections = {
 			const output = execSync(`./loader.nu commands`, {
 				encoding: 'utf-8', cwd: 'src/data', maxBuffer: 1024 * 1024 * 4
 			});
-			const data = parse(output);
+			const data = parse_json(output);
 			return data;
 		},
 		schema: z.object({
