@@ -3,7 +3,7 @@ title: Installing Nushell
 description: How to install Nushell and begin using commands.
 ---
 
-import { Aside, Steps } from "@astrojs/starlight/components";
+import { Aside, Steps, Tabs, TabItem } from "@astrojs/starlight/components";
 
 This guide will help you get Nushell up and running on your system,
 regardless of operating system. It will also cover how to access Nu and
@@ -56,69 +56,67 @@ below, go ahead and install it with your package manager like any other package.
 import Repology from '../../../components/Repology.astro';
 
 <div class="linux-package-install">
-    <Repology columns="2" altText="See package managers carrying Nu." />
+    <Repology columns="3" altText="See package managers carrying Nu." />
 </div>
 
 Notably, Nushell provides official packages for the following repos who don't ship Nu binaries by default.
 
 If you're using one of these distros, go ahead and copy the code into your terminal to get Nu installed.
 
-#### Debian / Ubuntu
+<Tabs>
+    <TabItem label="Debian / Ubuntu">
+        <Steps>
+        1. Save the Nushell GPG public key to the `apt` keyring.
+            ```shell
+            wget -qO- https://apt.fury.io/nushell/gpg.key \
+                | sudo gpg --dearmor -o /etc/apt/keyrings/fury-nushell.gpg
+            ```
 
-<Steps>
-1. Save the Nushell GPG public key to the `apt` keyring.
-    ```shell
-    wget -qO- https://apt.fury.io/nushell/gpg.key \
-        | sudo gpg --dearmor -o /etc/apt/keyrings/fury-nushell.gpg
-    ```
+        2. Add the Nushell repository to `apt`.
+            ```shell
+            echo "deb [signed-by=/etc/apt/keyrings/fury-nushell.gpg] https://apt.fury.io/nushell/ /" \
+                | sudo tee /etc/apt/sources.list.d/fury-nushell.list
+            ```
 
-2. Add the Nushell repository to `apt`.
-    ```shell
-    echo "deb [signed-by=/etc/apt/keyrings/fury-nushell.gpg] https://apt.fury.io/nushell/ /" \
-        | sudo tee /etc/apt/sources.list.d/fury-nushell.list
-    ```
-
-3. Update to pull from the new repo and install Nushell.
-    ```shell
-    sudo apt update
-    sudo apt install nushell
-    ```
-</Steps>
-
-#### Redhat / Fedora / Rocky
-
-<Steps>
-1. Add the Nushell `rpm` package repository.
-    ```shell
-    echo "[gemfury-nushell]
-    name=Gemfury Nushell Repo
-    baseurl=https://yum.fury.io/nushell/
-    enabled=1
-    gpgcheck=0
-    gpgkey=https://yum.fury.io/nushell/gpg.key" \
-        | sudo tee /etc/yum.repos.d/fury-nushell.repo
-    ```
-2. Install the Nushell package.
-    ```shell
-    sudo dnf install nushell
-    ```
-</Steps>
-
-#### Alpine
-
-<Steps>
-1. Append the Nushell repository link to the repositories list.
-    ```shell
-    echo "https://alpine.fury.io/nushell/" | tee -a /etc/apk/repositories
-    ```
-2. Update to pull from the new repo and install Nushell.
-    ```shell
-    apk update
-    apk add --allow-untrusted nushell
-    ```
-</Steps>
-
----
+        3. Update to pull from the new repo and install Nushell.
+            ```shell
+            sudo apt update
+            sudo apt install nushell
+            ```
+        </Steps>
+    </TabItem>
+    <TabItem label="RHEL / Fedora / Rocky">
+        <Steps>
+            1. Add the Nushell `rpm` package repository.
+                ```shell
+                echo "[gemfury-nushell]
+                name=Gemfury Nushell Repo
+                baseurl=https://yum.fury.io/nushell/
+                enabled=1
+                gpgcheck=0
+                gpgkey=https://yum.fury.io/nushell/gpg.key" \
+                    | sudo tee /etc/yum.repos.d/fury-nushell.repo
+                ```
+            2. Install the Nushell package.
+                ```shell
+                sudo dnf install nushell
+                ```
+        </Steps>
+    </TabItem>
+    <TabItem label="Alpine">
+        <Steps>
+            1. Append the Nushell repository link to the repositories list.
+                ```shell
+                echo "https://alpine.fury.io/nushell/" | tee -a /etc/apk/repositories
+                ```
+            2. Update to pull from the new repo and install Nushell.
+                ```shell
+                apk update
+                apk add --allow-untrusted nushell
+                ```
+        </Steps>
+    </TabItem>
+</Tabs>
 
 <Aside title="Still not covered?" type="note">
     You can install Nushell through [npm](https://www.npmjs.com/), but keep in mind
