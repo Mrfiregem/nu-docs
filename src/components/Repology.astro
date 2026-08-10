@@ -3,12 +3,17 @@ interface Props {
     columns?: number;
     altText?: string;
 }
-const { columns = 1, altText = "Packaging status" } = Astro.props;
+const { columns = 0, altText = "Packaging status" } = Astro.props;
+
+const builder = new URL(
+    "https://repology.org/badge/vertical-allrepos/nushell.svg",
+);
+if (columns > 0) {
+    builder.searchParams.set("columns", columns.toString());
+}
+const img_src = builder.toString();
 ---
 
 <a href="https://repology.org/project/nushell/versions">
-    <img
-        src=`https://repology.org/badge/vertical-allrepos/nushell.svg?columns=${Math.max(1, Math.round(columns))}`
-        alt={altText}
-    />
+    <img src={img_src} alt={altText} />
 </a>
