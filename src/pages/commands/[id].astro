@@ -18,6 +18,7 @@ export async function getStaticPaths() {
 }
 
 const { cmd } = Astro.props;
+const categorySlug = cmd.data.category.replaceAll(/\s+/g, "_");
 
 const headings: MarkdownHeading[] = [
     {
@@ -150,7 +151,7 @@ const headings: MarkdownHeading[] = [
         }
         <p>
             <b>Category:</b>&nbsp;
-            <a href={`/nu-docs/commands/#${cmd.data.category}`}>
+            <a href={`/nu-docs/commands/#${categorySlug}`}>
                 {cmd.data.category}
             </a>
         </p>
