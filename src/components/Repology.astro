@@ -1,0 +1,14 @@
+---
+interface Props {
+    columns?: number;
+    altText?: string;
+}
+const { columns = 1, altText = "Packaging status" } = Astro.props;
+---
+
+<a href="https://repology.org/project/nushell/versions">
+    <img
+        src=`https://repology.org/badge/vertical-allrepos/nushell.svg?columns=${Math.max(1, Math.round(columns))}`
+        alt={altText}
+    />
+</a>

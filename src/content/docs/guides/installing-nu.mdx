@@ -1,0 +1,220 @@
+---
+title: Installing Nushell
+description: How to install Nushell and begin using commands.
+---
+
+import { Aside, Steps } from "@astrojs/starlight/components";
+
+This guide will help you get Nushell up and running on your system,
+regardless of operating system. It will also cover how to access Nu and
+additional components shipped with it, like plugins.
+
+## Installing Nushell
+
+### Windows
+
+Nushell publishes official packages to Microsoft's package manager, Winget.
+To install Nu, simply run this command in Powershell or `cmd.exe`.
+
+```shell
+# Install for just the current user
+winget install nushell
+
+# Install for all users of a system
+winget install nushell --scope machine
+```
+
+<Aside type='caution' title='For user installations'>
+    Due to [winget-cli issue #3011](https://github.com/microsoft/winget-cli/issues/3011),
+    upgrading Nu to the latest version will instead install a second copy of Nu in a different location.
+
+    To correctly update user installations, run `winget install nushell` again instead.
+</Aside>
+
+Users of the [Scoop](https://scoop.sh/) package manager can also install Nushell with the following command.
+
+```shell
+scoop install main/nu
+```
+
+### MacOS
+
+Macbook users can install Nushell using [Homebrew](https://brew.sh/).
+
+Follow the instructions from that site to install it if the `brew`command
+is not already on your system, then run this command in your terminal.
+
+```shell
+brew install nushell
+```
+
+### Linux
+
+Nushell is available on various distros' package managers. If your distro is listed
+below, go ahead and install it with your package manager like any other package.
+
+import Repology from '../../../components/Repology.astro';
+
+<div class="linux-package-install">
+    <Repology columns="2" altText="See package managers carrying Nu." />
+</div>
+
+Notably, Nushell provides official packages for the following repos who don't ship Nu binaries by default.
+
+If you're using one of these distros, go ahead and copy the code into your terminal to get Nu installed.
+
+#### Debian / Ubuntu
+
+<Steps>
+1. Save the Nushell GPG public key to the `apt` keyring.
+    ```shell
+    wget -qO- https://apt.fury.io/nushell/gpg.key \
+        | sudo gpg --dearmor -o /etc/apt/keyrings/fury-nushell.gpg
+    ```
+
+2. Add the Nushell repository to `apt`.
+    ```shell
+    echo "deb [signed-by=/etc/apt/keyrings/fury-nushell.gpg] https://apt.fury.io/nushell/ /" \
+        | sudo tee /etc/apt/sources.list.d/fury-nushell.list
+    ```
+
+3. Update to pull from the new repo and install Nushell.
+    ```shell
+    sudo apt update
+    sudo apt install nushell
+    ```
+</Steps>
+
+#### Redhat / Fedora / Rocky
+
+<Steps>
+1. Add the Nushell `rpm` package repository.
+    ```shell
+    echo "[gemfury-nushell]
+    name=Gemfury Nushell Repo
+    baseurl=https://yum.fury.io/nushell/
+    enabled=1
+    gpgcheck=0
+    gpgkey=https://yum.fury.io/nushell/gpg.key" \
+        | sudo tee /etc/yum.repos.d/fury-nushell.repo
+    ```
+2. Install the Nushell package.
+    ```shell
+    sudo dnf install nushell
+    ```
+</Steps>
+
+#### Alpine
+
+<Steps>
+1. Append the Nushell repository link to the repositories list.
+    ```shell
+    echo "https://alpine.fury.io/nushell/" | tee -a /etc/apk/repositories
+    ```
+2. Update to pull from the new repo and install Nushell.
+    ```shell
+    apk update
+    apk add --allow-untrusted nushell
+    ```
+</Steps>
+
+---
+
+<Aside title="Still not covered?" type="note">
+    You can install Nushell through [npm](https://www.npmjs.com/), but keep in mind
+    that if you do, official plugins will not be included in this installation.
+    
+    ```shell
+    npm install -g nushell
+    ```
+</Aside>
+
+## Docker Container Images
+
+Docker images are available from the GitHub Container Registry. An image for the latest
+release is built regularly for Alpine and Debian. You can run the image in interactive mode using:
+
+```shell
+docker run -it --rm "ghcr.io/nushell/nushell:<version>-<distro>"
+```
+
+Where `<version>` is the version of Nushell you want to run and`<distro>`
+is `alpine` or the latest supported Debian release, such as `bookworm`.
+
+To run a specific command, use:
+
+```shell
+docker run --rm ghcr.io/nushell/nushell:latest-alpine -c "ls /usr/bin | where size > 10KiB"
+```
+
+To run a script from the current directory using Bash, use:
+
+```shell
+docker run --rm \
+    -v "${PWD}:/work" \
+    ghcr.io/nushell/nushell:latest-alpine \
+    "/work/script.nu"
+```
+
+## Building From Source
+
+It's also possible to build Nu from source code. To do so, you must set up the Rust toolchain and its dependencies.
+
+### Installing the Rust Toolchain
+
+#### Installing a Compiler Suite
+
+For Rust to work properly, you'll need to have a compatible compiler suite installed on your system. The recommended compiler suites are:
+
+<dl>
+    <dt>Linux</dt>
+    <dd>GCC / Clang</dd>
+    <dt>MacOS</dt>
+    <dd>Clang (Via installing [Xcode](https://developer.apple.com/documentation/xcode/installing-the-command-line-tools/))</dd>
+    <dt>Windows</dt>
+    <dd>
+        MSVC (Via installing [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2026))[^vs]
+    </dd>
+</dl>
+
+[^vs]: Make sure to install the "Desktop development with C++" workload.
+
+#### Installing Rust
+
+Nushell targets the **latest stable** Rust version. If your package manager ships with an up-to-date Rust compiler, feel free to use that.
+
+If installing Rust through your package manager is not on option, [rustup](https://rustup.rs/) is the preferred way to manage Rust.
+
+#### Dependencies
+
+To compile Nu, you need the following libraries:
+
+- Ubuntu / Debian: `sudo apt install pkg-config libssl-dev build-essential`
+- RHEL / Fedora: `sudo dnf install libxcb openssl-devel libX11-devel`
+- MacOS: `brew install openssl cmake`
+
+#### Building the Package
+
+Nushell publishes releases to the Rust package repository [crates.io](https://crates.io/).
+This means installing Nushell is as easy as running the following command.
+
+```shell
+cargo install --locked nu
+```
+
+If you'd rather build Nu from the latest source, follow these steps instead.
+
+<Steps>
+1. Locally clone the Nushell repo and open it.
+    ```shell
+    git clone https://github.com/nushell/nushell.git
+    cd nushell
+    ```
+2. Install Nu alongside default plugins.
+    ```shell
+    cargo build --workspace
+
+    # Run the newly-built `nu` binary
+    cargo run
+    ```
+</Steps>

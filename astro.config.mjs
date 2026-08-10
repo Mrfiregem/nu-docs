@@ -13,11 +13,12 @@ export default defineConfig({
 				{ icon: 'github', label: 'Source Code', href: 'https://github.com/Mrfiregem/nu-docs' },
 			],
 			sidebar: [
+				{ slug: 'guides/installing-nu' },
 				{
 					label: 'Guides',
 					items: [
 						// Each item here is one entry in the navigation menu.
-						{ label: 'Getting Started', slug: 'guides/getting-started' },
+						{ slug: 'guides/getting-started' },
 					],
 				},
 				{
