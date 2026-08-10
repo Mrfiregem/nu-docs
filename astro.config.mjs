@@ -31,6 +31,7 @@ export default defineConfig({
 			],
 			editLink: { baseUrl: 'https://github.com/Mrfiregem/nu-docs/edit/main/' },
 			customCss: ['./src/styles/add-containers.css'],
+			favicon: '/favicon.png',
 		}),
 	],
 });
