@@ -1,5 +1,6 @@
 ---
 import linkifyHtml from "linkify-html";
+import slugify from "@sindresorhus/slugify";
 
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import AnchorHeading from "@astrojs/starlight/components/AnchorHeading.astro";
@@ -17,7 +18,7 @@ export async function getStaticPaths() {
 }
 
 const { cmd } = Astro.props;
-const categorySlug = cmd.data.category.replaceAll(/\s+/g, "_");
+const categorySlug = slugify(cmd.data.category);
 
 const headings = [
     {

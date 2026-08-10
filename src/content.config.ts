@@ -1,10 +1,11 @@
 import { defineCollection } from 'astro:content';
 import { docsLoader } from '@astrojs/starlight/loaders';
 import { docsSchema } from '@astrojs/starlight/schema';
+import { z } from 'astro/zod';
 
 import { execSync } from "node:child_process";
 import { parse as parse_json } from 'hjson';
-import { z } from 'astro/zod';
+import slugify from '@sindresorhus/slugify';
 
 export const collections = {
 	docs: defineCollection({ loader: docsLoader(), schema: docsSchema() }),
@@ -14,7 +15,10 @@ export const collections = {
 				encoding: 'utf-8', cwd: 'src/data', maxBuffer: 1024 * 1024 * 4
 			});
 			const data = parse_json(output);
-			return data;
+			return data.map((cmd: { [key: string]: any }) => ({
+				...cmd,
+				id: slugify(cmd.name),
+			}));
 		},
 		schema: z.object({
 			id: z.string(),

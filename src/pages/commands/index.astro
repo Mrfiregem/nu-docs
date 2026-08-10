@@ -1,4 +1,6 @@
 ---
+import slugify from "@sindresorhus/slugify";
+
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import AnchorHeading from "@astrojs/starlight/components/AnchorHeading.astro";
 
@@ -7,11 +9,16 @@ import type { MarkdownHeading } from "astro";
 import { Aside } from "@astrojs/starlight/components";
 
 const allCmds = await getCollection("commands");
-const sortedCmds = allCmds.sort(
-    (a, b) =>
-        a.data.category.localeCompare(b.data.category) ||
-        a.id.localeCompare(b.id),
-);
+const sortedCmds = allCmds
+    .sort(
+        (a, b) =>
+            a.data.category.localeCompare(b.data.category) ||
+            a.id.localeCompare(b.id),
+    )
+    .map((cmd) => ({
+        ...cmd,
+        slugged_category: slugify(cmd.data.category),
+    }));
 ---
 
 <StarlightPage
@@ -20,7 +27,7 @@ const sortedCmds = allCmds.sort(
         .map((cmd) => {
             const heading: MarkdownHeading = {
                 depth: 2,
-                slug: cmd.data.category.replaceAll(/\s+/g, "_"),
+                slug: cmd.slugged_category,
                 text: cmd.data.category,
             };
             return heading;
@@ -38,16 +45,13 @@ const sortedCmds = allCmds.sort(
 
     <dl id="command-list" class="not-content">
         {
-            allCmds.map((cmd, index) => {
+            sortedCmds.map((cmd, index) => {
                 const isNewCategory =
                     cmd.data.category !== sortedCmds[index - 1]?.data.category;
                 return (
                     <Fragment key={cmd.id}>
                         {isNewCategory && (
-                            <AnchorHeading
-                                level="2"
-                                id={cmd.data.category.replaceAll(/\s+/g, "_")}
-                            >
+                            <AnchorHeading level="2" id={cmd.slugged_category}>
                                 {cmd.data.category}
                             </AnchorHeading>
                         )}
