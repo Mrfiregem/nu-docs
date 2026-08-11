@@ -3,7 +3,7 @@ title: Installing Nushell
 description: How to install Nushell and begin using commands.
 ---
 
-import { Aside, Steps, Tabs, TabItem } from "@astrojs/starlight/components";
+import { Steps, Tabs, TabItem } from "@astrojs/starlight/components";
 
 This guide will help you get Nushell up and running on your system,
 regardless of operating system. It will also cover how to access Nu and
@@ -24,12 +24,12 @@ winget install nushell
 winget install nushell --scope machine
 ```
 
-<Aside type='caution' title='For user installations'>
-    Due to [winget-cli issue #3011](https://github.com/microsoft/winget-cli/issues/3011),
-    upgrading Nu to the latest version will instead install a second copy of Nu in a different location.
+:::caution[For user installations]
+Due to [winget-cli issue #3011](https://github.com/microsoft/winget-cli/issues/3011),
+upgrading Nu to the latest version will instead install a second copy of Nu in a different location.
 
-    To correctly update user installations, run `winget install nushell` again instead.
-</Aside>
+To correctly update user installations, run `winget install nushell` again instead.
+:::
 
 Users of the [Scoop](https://scoop.sh/) package manager can also install Nushell with the following command.
 
@@ -118,14 +118,14 @@ If you're using one of these distros, go ahead and copy the code into your termi
     </TabItem>
 </Tabs>
 
-<Aside title="Still not covered?" type="note">
-    You can install Nushell through [npm](https://www.npmjs.com/), but keep in mind
-    that if you do, official plugins will not be included in this installation.
-    
-    ```shell
-    npm install -g nushell
-    ```
-</Aside>
+:::note[Still not covered?]
+You can install Nushell through [npm](https://www.npmjs.com/), but keep in mind
+that if you do, official plugins will not be included in this installation.
+
+```shell
+npm install -g nushell
+```
+:::
 
 ## Docker Container Images
 
