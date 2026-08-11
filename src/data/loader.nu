@@ -13,7 +13,6 @@ def 'main commands' [plugin_dir: directory = $nu_dir]: nothing -> string {
     let plugin_flags = $plugins | each --flatten {|p| [$plugin_dir, $p] | path join | prepend '--plugins' }
     let command = r#'
         scope commands
-        | insert id {|cmd| $cmd.name | str replace -ra '\s+' '_' }
         | insert sig_str {|cmd|
             let pos = $cmd.signatures
                 | values | first
@@ -43,6 +42,13 @@ def 'main commands' [plugin_dir: directory = $nu_dir]: nothing -> string {
         }
         | insert flags {|cmd|
             $cmd.signatures | values | first | where parameter_type in [named, switch]
+        }
+        | par-each {
+            insert deprecated {|cmd|
+                ^$nu.current-exe --no-config-file ...(plugin list | each --flatten { [--plugins, $in.filename] }) --commands $'($cmd.name) --help'
+                | complete
+                | $in.stderr has 'nu::parser::deprecated'
+            }
         }
         | to json
     '#

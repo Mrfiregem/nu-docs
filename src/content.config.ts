@@ -12,7 +12,7 @@ export const collections = {
 	commands: defineCollection({
 		loader: () => {
 			const output = execSync(`./loader.nu commands`, {
-				encoding: 'utf-8', cwd: 'src/data', maxBuffer: 1024 * 1024 * 4
+				encoding: 'utf-8', cwd: 'src/data', maxBuffer: 1024 * 1024 * 8
 			});
 			const data = parse_json(output);
 			return data.map((cmd: { [key: string]: any }) => ({
@@ -46,7 +46,8 @@ export const collections = {
 					description: z.string(),
 					parameter_default: z.string().nullish(),
 				})
-			)
+			),
+			deprecated: z.boolean(),
 		}),
 	})
 };

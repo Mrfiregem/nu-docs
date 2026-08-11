@@ -37,12 +37,12 @@ const headings = [
         text: "Command Flags",
     },
 ];
+
+console.log(cmd);
 ---
 
 <StarlightPage frontmatter={{ title: cmd.data.name }} headings={headings}>
     <p>{cmd.data.description}</p>
-
-    {console.log({ deprecated: cmd.data.deprecated })}
 
     {
         cmd.data.deprecated && (

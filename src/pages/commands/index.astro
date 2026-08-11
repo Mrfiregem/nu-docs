@@ -56,7 +56,12 @@ const sortedCmds = allCmds
                             </AnchorHeading>
                         )}
                         <dt>
-                            <a href={`/nu-docs/commands/${cmd.id}/`}>
+                            <a
+                                href={`/nu-docs/commands/${cmd.id}/`}
+                                class:list={[
+                                    { deprecated: cmd.data.deprecated },
+                                ]}
+                            >
                                 {cmd.data.name}
                             </a>
                             {cmd.data.type === "plugin" && (
@@ -74,6 +79,9 @@ const sortedCmds = allCmds
 </StarlightPage>
 
 <style>
+    .deprecated {
+        text-decoration: line-through;
+    }
     /* Show description below command name if there's not room */
     @container --sl-container (width <= 640px) {
         dt {
