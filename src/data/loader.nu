@@ -54,3 +54,41 @@ def 'main commands' [plugin_dir: directory = $nu_dir]: nothing -> string {
     '#
     ^$nu.current-exe --no-config-file ...$plugin_flags --commands $command
 }
+
+def 'main stdlib' [] {
+    view files
+    | where filename like 'std(?:-rfc)?/'
+    | get filename
+    | each -f {|path|
+        path split
+        | window 2
+        | each { match $in {
+            [$name, 'mod.nu'] => {name: $name, path: $path, library: ($path | path split).0}
+        } }
+    }
+    | insert fill-in {|mod|
+        {}
+        | insert commands {
+            nu --no-config-file --commands $'
+                overlay use -p ($mod.path) as __docgen__
+                scope commands
+                | where name starts-with "__docgen__"
+                | to json
+            '
+            | from json
+            | update name { str replace '__docgen__' $mod.name }
+        }
+        | insert variables {
+            nu --no-config-file --commands $'
+                overlay use -p ($mod.path) as __docgen__
+                scope variables
+                | where name == "$__docgen__"
+                | to json
+            '
+            | from json
+            | update name { str replace '__docgen__' $mod.name }
+        }
+    }
+    | flatten fill-in
+    | to json
+}

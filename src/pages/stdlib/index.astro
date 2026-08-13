@@ -1,0 +1,86 @@
+---
+import AnchorHeading from "@astrojs/starlight/components/AnchorHeading.astro";
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import slugify from "@sindresorhus/slugify";
+import { getCollection } from "astro:content";
+
+const allLibs = await getCollection("stdlib");
+const sortedLibCmds = allLibs
+    .filter((lib) => lib.data.name !== lib.data.library)
+    .flatMap((lib) =>
+        lib.data.commands.map((cmd) => ({
+            id: slugify(lib.data.library + "-" + cmd.name),
+            data: {
+                ...cmd,
+                library: lib.data.library,
+                module: lib.data.name,
+                get fullModule(): string {
+                    return `${this.library}/${this.module}`;
+                },
+                get fullModuleSlug(): string {
+                    return slugify(this.fullModule);
+                },
+            },
+        })),
+    )
+    .sort(
+        (a, b) =>
+            a.data.library.localeCompare(b.data.library) ||
+            a.data.module.localeCompare(b.data.module) ||
+            a.data.name.localeCompare(b.data.name),
+    );
+---
+
+<StarlightPage frontmatter={{ title: "Nushell Stdlib" }}>
+    <div id="stdlib-list" class="not-content">
+        {
+            sortedLibCmds.map((cmd, index) => {
+                const isNewLibrary =
+                    cmd.data.library !== sortedLibCmds[index - 1]?.data.library;
+                const isNewModule =
+                    cmd.data.module !== sortedLibCmds[index - 1]?.data.module;
+                return (
+                    <Fragment key={cmd.id}>
+                        {isNewLibrary && (
+                            <AnchorHeading
+                                class="span-cols"
+                                level="2"
+                                id={cmd.data.library}
+                            >
+                                {cmd.data.library}
+                            </AnchorHeading>
+                        )}
+                        {isNewModule && (
+                            <AnchorHeading
+                                class="span-cols"
+                                level="3"
+                                id={cmd.data.fullModuleSlug}
+                            >
+                                {cmd.data.fullModule}
+                            </AnchorHeading>
+                        )}
+                        <div class="cmd-name">
+                            <a href={`/nu-docs/stdlib/${cmd.id}`}>
+                                {cmd.data.name}
+                            </a>
+                        </div>
+                        <div class="cmd-desc">{cmd.data.description}</div>
+                    </Fragment>
+                );
+            })
+        }
+    </div>
+</StarlightPage>
+
+<style>
+    #stdlib-list {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        max-width: 100%;
+        gap: 0.5em 2ch;
+
+        .sl-heading-wrapper {
+            grid-column: 1/ -1;
+        }
+    }
+</style>
