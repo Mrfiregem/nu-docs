@@ -5,16 +5,13 @@ description: How to install Nushell and begin using commands.
 
 import { Steps, Tabs, TabItem } from "@astrojs/starlight/components";
 
-This guide will help you get Nushell up and running on your system,
-regardless of operating system. It will also cover how to access Nu and
-additional components shipped with it, like plugins.
+This guide will help you get Nushell up and running on your system, regardless of operating system. It will also cover how to access Nu and additional components shipped with it, like plugins.
 
 ## Installing Nushell
 
 ### Windows
 
-Nushell publishes official packages to Microsoft's package manager, Winget.
-To install Nu, simply run this command in Powershell or `cmd.exe`.
+Nushell publishes official packages to Microsoft's package manager, Winget. To install Nu, simply run this command in Powershell or `cmd.exe`.
 
 ```shell
 # Install for just the current user
@@ -25,8 +22,7 @@ winget install nushell --scope machine
 ```
 
 :::caution[For user installations]
-Due to [winget-cli issue #3011](https://github.com/microsoft/winget-cli/issues/3011),
-upgrading Nu to the latest version will instead install a second copy of Nu in a different location.
+Due to [winget-cli issue #3011](https://github.com/microsoft/winget-cli/issues/3011), upgrading Nu to the latest version will instead install a second copy of Nu in a different location.
 
 To correctly update user installations, run `winget install nushell` again instead.
 :::
@@ -41,8 +37,7 @@ scoop install main/nu
 
 Macbook users can install Nushell using [Homebrew](https://brew.sh/).
 
-Follow the instructions from that site to install it if the `brew`command
-is not already on your system, then run this command in your terminal.
+Follow the instructions from that site to install it if the `brew`command is not already on your system, then run this command in your terminal.
 
 ```shell
 brew install nushell
@@ -50,8 +45,7 @@ brew install nushell
 
 ### Linux
 
-Nushell is available on various distros' package managers. If your distro is listed
-below, go ahead and install it with your package manager like any other package.
+Nushell is available on various distros' package managers. If your distro is listed below, go ahead and install it with your package manager like any other package.
 
 import Repology from '../../../components/Repology.astro';
 
@@ -119,8 +113,7 @@ If you're using one of these distros, go ahead and copy the code into your termi
 </Tabs>
 
 :::note[Still not covered?]
-You can install Nushell through [npm](https://www.npmjs.com/), but keep in mind
-that if you do, official plugins will not be included in this installation.
+You can install Nushell through [npm](https://www.npmjs.com/), but keep in mind that if you do, official plugins will not be included in this installation.
 
 ```shell
 npm install -g nushell
@@ -129,15 +122,13 @@ npm install -g nushell
 
 ## Docker Container Images
 
-Docker images are available from the GitHub Container Registry. An image for the latest
-release is built regularly for Alpine and Debian. You can run the image in interactive mode using:
+Docker images are available from the GitHub Container Registry. An image for the latest release is built regularly for Alpine and Debian. You can run the image in interactive mode using:
 
 ```shell
 docker run -it --rm "ghcr.io/nushell/nushell:<version>-<distro>"
 ```
 
-Where `<version>` is the version of Nushell you want to run and`<distro>`
-is `alpine` or the latest supported Debian release, such as `bookworm`.
+Where `<version>` is the version of Nushell you want to run and`<distro>` is `alpine` or the latest supported Debian release, such as `bookworm`.
 
 To run a specific command, use:
 
@@ -193,8 +184,7 @@ To compile Nu, you need the following libraries:
 
 #### Building the Package
 
-Nushell publishes releases to the Rust package repository [crates.io](https://crates.io/).
-This means installing Nushell is as easy as running the following command.
+Nushell publishes releases to the Rust package repository [crates.io](https://crates.io/). This means installing Nushell is as easy as running the following command.
 
 ```shell
 cargo install --locked nu

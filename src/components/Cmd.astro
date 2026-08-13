@@ -1,0 +1,15 @@
+---
+import slugify from "@sindresorhus/slugify";
+
+/** Display a styled command name that links back to its documentation. */
+interface Props {
+    /** The name of the command, e.g. `"ls"` or `"str length"` */
+    name: string;
+}
+
+const { name } = Astro.props;
+---
+
+<a target="_blank" class="cmdLink" href=`/nu-docs/commands/${slugify(name)}`>
+    <code>{name}</code>
+</a>

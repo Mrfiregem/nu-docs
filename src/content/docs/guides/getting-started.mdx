@@ -1,0 +1,60 @@
+---
+title: Getting Started
+description: Getting started using Nushell.
+---
+
+import Cmd from '../../../components/Cmd.astro';
+
+The easiest way to get started using Nu is to begin with examples. This is especially true if you're familiar with another shell's syntax.
+
+## Nushell Works With _Data_, Not Just Text
+
+Let's say you open Nu and run the ubiquitous <Cmd name="ls"/> command, but instead of the simple list of file names you're used to, this shows up!
+
+```nushell
+ls
+# => ╭────┬─────────────────────┬─────────┬──────────┬──────────────╮
+# => │  # │        name         │  type   │   size   │   modified   │
+# => ├────┼─────────────────────┼─────────┼──────────┼──────────────┤
+# => │  0 │ AGENTS.md           │ file    │   1.6 kB │ 2 days ago   │
+# => │  1 │ CITATION.cff        │ file    │    812 B │ 2 days ago   │
+# => │  2 │ CLAUDE.md           │ symlink │      9 B │ 2 days ago   │
+# => │  3 │ CODE_OF_CONDUCT.md  │ file    │   3.4 kB │ 2 days ago   │
+# => │  4 │ CONTRIBUTING.md     │ file    │  18.3 kB │ 2 days ago   │
+# => │  5 │ Cargo.lock          │ file    │ 268.8 kB │ 17 hours ago │
+# => │  6 │ Cargo.toml          │ file    │  16.4 kB │ 17 hours ago │
+# => │  7 │ Cross.toml          │ file    │    666 B │ 2 days ago   │
+# => │  8 │ LICENSE             │ file    │   1.0 kB │ 2 days ago   │
+# => │  9 │ README.md           │ file    │  12.5 kB │ 2 days ago   │
+# => │ 10 │ SECURITY.md         │ file    │   2.6 kB │ 2 days ago   │
+# => ...
+```
+
+While you might think this is just normal `ls` output formatted nicely, this is an actual table value we can work with _interactively_, just as if it was a spreadsheet.
+
+## Acting On Data
+
+The normal list of files is fine in most cases, but let's say we want to sort this table so that the biggest files are displayed first? Nushell makes these types of operations easy.
+
+To do this, we'll first take the output of <Cmd name="ls"/> and feed it into a command that can sort tables based on the values in a _column_.
+
+```nushell
+ls | sort-by size | reverse
+# => ╭────┬─────────────────────┬─────────┬──────────┬──────────────╮
+# => │  # │        name         │  type   │   size   │   modified   │
+# => ├────┼─────────────────────┼─────────┼──────────┼──────────────┤
+# => │  0 │ Cargo.lock          │ file    │ 268.8 kB │ 17 hours ago │
+# => │  1 │ CONTRIBUTING.md     │ file    │  18.3 kB │ 2 days ago   │
+# => │  2 │ Cargo.toml          │ file    │  16.4 kB │ 17 hours ago │
+# => │  3 │ README.md           │ file    │  12.5 kB │ 2 days ago   │
+# => │  4 │ CODE_OF_CONDUCT.md  │ file    │   3.4 kB │ 2 days ago   │
+# => │  5 │ SECURITY.md         │ file    │   2.6 kB │ 2 days ago   │
+# => │  6 │ AGENTS.md           │ file    │   1.6 kB │ 2 days ago   │
+# => │  7 │ crates              │ dir     │   1.1 kB │ 2 days ago   │
+# => │  8 │ LICENSE             │ file    │   1.0 kB │ 2 days ago   │
+# => │  9 │ rust-toolchain.toml │ file    │    939 B │ 2 days ago   │
+# => │ 10 │ CITATION.cff        │ file    │    812 B │ 2 days ago   │
+# => ...
+```
+
+Notice that we didn't pass commandline arguments or switches to ls. Instead, we used Nushell's built-in sort-by command to sort the output of the ls command. Then, to see the largest files on top, we used reverse on the output of sort-by.
