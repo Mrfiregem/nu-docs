@@ -4,6 +4,7 @@ import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import slugify from "@sindresorhus/slugify";
 import type { MarkdownHeading } from "astro";
 import { getCollection } from "astro:content";
+import Cmd from "../../components/Cmd.astro";
 
 const allLibs = await getCollection("stdlib");
 const sortedLibCmds = allLibs
@@ -45,6 +46,18 @@ const headings: MarkdownHeading[] = sortedLibCmds
 ---
 
 <StarlightPage frontmatter={{ title: "Nushell Stdlib" }} headings={headings}>
+    <p>
+        Below, you can find the list of commands provided by the Nu standard
+        library. These are commands written in pure Nu script and accessible
+        from scripts and the command line through the use of <Cmd name="use" /> and
+        <Cmd name="overlay use" />.
+    </p>
+    <p>
+        Nushell provides two libraries, <code>std</code>, which contains
+        relatively stable commands, and <code>std-rfc</code>, which contains
+        commands whose functionality may be more likely to change or be removed.
+    </p>
+
     <div id="stdlib-list" class="not-content">
         {
             sortedLibCmds.map((cmd, index) => {

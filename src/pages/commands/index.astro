@@ -19,24 +19,31 @@ const sortedCmds = allCmds
         ...cmd,
         slugged_category: slugify(cmd.data.category),
     }));
+const headings: MarkdownHeading[] = sortedCmds
+    .map((cmd) => {
+        const heading: MarkdownHeading = {
+            depth: 2,
+            slug: cmd.slugged_category,
+            text: cmd.data.category,
+        };
+        return heading;
+    })
+    .filter(
+        (item, index, self) =>
+            index === self.findIndex((t) => t.slug === item.slug),
+    );
 ---
 
-<StarlightPage
-    frontmatter={{ title: "Nushell Commands" }}
-    headings={sortedCmds
-        .map((cmd) => {
-            const heading: MarkdownHeading = {
-                depth: 2,
-                slug: cmd.slugged_category,
-                text: cmd.data.category,
-            };
-            return heading;
-        })
-        .filter(
-            (item, index, self) =>
-                index === self.findIndex((t) => t.slug === item.slug),
-        )}
->
+<StarlightPage frontmatter={{ title: "Nushell Commands" }} headings={headings}>
+    <p>
+        Nushell provides many commands to work with data. Listed below are all
+        the internal commands shipped with Nushell and usable out-of-the-box in
+        your Nu binary. Nushell also ships with custom functions written in Nu
+        accessible from Nu's standard library, which you can see listed on the <a
+            href="/nu-docs/stdlib">stdlib index</a
+        > page.
+    </p>
+
     <Aside title="Plugin commands" type="tip" icon="information">
         Commands annotated with a (&dagger;) require a plugin to be installed to
         use them. Go to their command page and look for a box like this to see
