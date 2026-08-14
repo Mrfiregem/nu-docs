@@ -23,24 +23,28 @@ const sortedLibCmds = allLibs
             a.module.localeCompare(b.module) ||
             a.name.localeCompare(b.name),
     );
+const headings: MarkdownHeading[] = sortedLibCmds
+    .flatMap((cmd, index, self) => {
+        const isNewLibrary = cmd.library !== self[index - 1]?.library;
+        let result = [
+            { depth: 3, slug: slugify(cmd.fullModule), text: cmd.fullModule },
+        ];
+        if (isNewLibrary) {
+            result.unshift({
+                depth: 2,
+                slug: slugify(cmd.library),
+                text: cmd.library,
+            });
+        }
+        return result;
+    })
+    .filter(
+        (item, index, self) =>
+            index === self.findIndex((t) => t.slug === item.slug),
+    );
 ---
 
-<StarlightPage
-    frontmatter={{ title: "Nushell Stdlib" }}
-    headings={sortedLibCmds
-        .map((cmd) => {
-            const heading: MarkdownHeading = {
-                depth: 2,
-                slug: slugify(cmd.fullModule),
-                text: cmd.fullModule,
-            };
-            return heading;
-        })
-        .filter(
-            (item, index, self) =>
-                index === self.findIndex((t) => t.slug === item.slug),
-        )}
->
+<StarlightPage frontmatter={{ title: "Nushell Stdlib" }} headings={headings}>
     <div id="stdlib-list" class="not-content">
         {
             sortedLibCmds.map((cmd, index) => {
