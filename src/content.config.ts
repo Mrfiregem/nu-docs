@@ -44,9 +44,16 @@ const commandSchema = z.object({
     get signature_string(): string {
         const positional = Object.values(data.signatures)[0].map(p => {
             switch (p.parameter_type) {
-                case 'positional': return `(${p.parameter_name})`;
-                case 'rest': return '...rest';
-                default: return null;
+                case 'positional':
+                    if (p.is_optional) {
+                        return `[${p.parameter_name}]`;
+                    } else {
+                        return `(${p.parameter_name})`;
+                    }
+                case 'rest':
+                    return '...rest';
+                default:
+                    return null;
             }
         }).filter(Boolean).join(' ');
         return [data.name, '{flags}', positional].filter(Boolean).join(' ');
