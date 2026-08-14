@@ -73,14 +73,24 @@ const sortedLibCmds = allLibs
 </StarlightPage>
 
 <style>
-    #stdlib-list {
-        display: grid;
-        grid-template-columns: max-content 1fr;
-        max-width: 100%;
-        gap: 0.5em 2ch;
+    @container --sl-container (width <= 640px) {
+        .cmd-name {
+            margin-block-start: 1em;
+        }
+        .cmd-desc {
+            margin-inline-start: 3ch;
+        }
+    }
+    @container --sl-container (width > 640px) {
+        #stdlib-list {
+            display: grid;
+            grid-template-columns: max-content 1fr;
+            max-width: 100%;
+            gap: 0.5em 2ch;
 
-        .sl-heading-wrapper {
-            grid-column: 1/ -1;
+            .sl-heading-wrapper {
+                grid-column: 1/ -1;
+            }
         }
     }
 </style>
