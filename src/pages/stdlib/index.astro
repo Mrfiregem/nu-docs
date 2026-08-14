@@ -24,6 +24,7 @@ const sortedLibCmds = allLibs
             a.module.localeCompare(b.module) ||
             a.name.localeCompare(b.name),
     );
+const title = "Nushell Standard Library";
 const headings: MarkdownHeading[] = sortedLibCmds
     .flatMap((cmd, index, self) => {
         const isNewLibrary = cmd.library !== self[index - 1]?.library;
@@ -45,7 +46,7 @@ const headings: MarkdownHeading[] = sortedLibCmds
     );
 ---
 
-<StarlightPage frontmatter={{ title: "Nushell Stdlib" }} headings={headings}>
+<StarlightPage frontmatter={{ title }} headings={headings}>
     <p>
         Below, you can find the list of commands provided by the Nu standard
         library. These are commands written in pure Nu script and accessible

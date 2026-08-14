@@ -1,72 +1,45 @@
 ---
-import linkifyHtml from "linkify-html";
-import slugify from "@sindresorhus/slugify";
-
-import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { Badge, Code } from "@astrojs/starlight/components";
 import AnchorHeading from "@astrojs/starlight/components/AnchorHeading.astro";
-
-import { Aside, Badge, Code } from "@astrojs/starlight/components";
-
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import slugify from "@sindresorhus/slugify";
 import { getCollection } from "astro:content";
+import linkifyHtml from "linkify-html";
 
 export async function getStaticPaths() {
-    const cmds = await getCollection("commands");
-    return cmds.map((cmd) => ({
-        params: { id: cmd.id },
+    const libs = await getCollection("stdlib");
+    const lib_cmds = libs.flatMap((lib) =>
+        lib.data.commands.map((cmd) => ({
+            ...cmd,
+            module: lib.data.module,
+            library: lib.data.library,
+            fullModule: lib.data.library + "/" + lib.data.module,
+            href_slug: slugify(lib.data.library + "-" + cmd.name),
+            id: slugify(lib.id + "-" + cmd.id),
+        })),
+    );
+    return lib_cmds.map((cmd) => ({
+        params: { href_slug: cmd.href_slug },
         props: { cmd },
     }));
 }
 
 const { cmd } = Astro.props;
-const categorySlug = slugify(cmd.data.category);
-
-const headings = [
-    { depth: 2, slug: "signature", text: "Signature" },
-    { depth: 3, slug: "input-output", text: "Input / Output Types" },
-    { depth: 3, slug: "flags", text: "Command Flags" },
-    { depth: 3, slug: "positionals", text: "Positional Arguments" },
-];
+const fullModuleSlug = slugify(cmd.fullModule);
 ---
 
-<StarlightPage frontmatter={{ title: cmd.data.name }} headings={headings}>
-    <p>{cmd.data.description}</p>
+<StarlightPage frontmatter={{ title: `${cmd.library}/${cmd.name}` }}>
+    <p>{cmd.description}</p>
 
     {
-        cmd.data.deprecated && (
-            <Aside type="danger" title="Deprecated Command">
-                This command will stop working in a future version of Nushell.
-            </Aside>
-        )
-    }
-
-    {
-        cmd.data.type === "plugin" && (
-            <Aside type="note" title="Plugin Command">
-                <p>
-                    This command is provided by an official Nushell plugin and
-                    will only work if you've previously run the following
-                    command with the correct plugin name:
-                </p>
-                <Code
-                    code={`plugin add ${cmd.data.plugin_file || "nu_plugin_{name}"}`}
-                    lang="nushell"
-                    mark="nu_plugin_{name}"
-                />
-            </Aside>
-        )
-    }
-
-    {
-        cmd.data.extra_description && (
+        cmd.extra_description && (
             <>
                 <hr />
                 <div id="extra_desc">
                     {/* Split extra description into sentences separated by newlines and punctuation */}
-                    {cmd.data.extra_description
-                        .split(/\r?\n/)
-                        .map((sentence) => (
-                            <p set:html={linkifyHtml(sentence)} />
-                        ))}
+                    {cmd.extra_description.split(/\r?\n/).map((sentence) => (
+                        <p set:html={linkifyHtml(sentence)} />
+                    ))}
                 </div>
             </>
         )
@@ -74,7 +47,7 @@ const headings = [
 
     <AnchorHeading id="signature" level="2">Signature</AnchorHeading>
 
-    <Code code={cmd.data.signature_string} frame="none" />
+    <Code code={cmd.signature_string} frame="none" />
 
     <AnchorHeading id="input-output" level="3">
         Input / Output Types
@@ -82,7 +55,7 @@ const headings = [
 
     <div class="input-output-list not-content">
         {
-            cmd.data.input_output_pairs.map(({ input, output }) => (
+            cmd.input_output_pairs.map(({ input, output }) => (
                 <>
                     <div class="input">{input}</div>
                     <div class="eq">&rarr;</div>
@@ -95,9 +68,9 @@ const headings = [
     <AnchorHeading id="flags" level="3">Command Flags</AnchorHeading>
 
     {
-        cmd.data.flags.length > 0 ? (
+        cmd.flags.length > 0 ? (
             <dl id="flag-list">
-                {cmd.data.flags.map(
+                {cmd.flags.map(
                     ({
                         parameter_name: name,
                         parameter_type: type,
@@ -148,9 +121,9 @@ const headings = [
     </AnchorHeading>
 
     {
-        cmd.data.positionals.length > 0 ? (
+        cmd.positionals.length > 0 ? (
             <dl>
-                {cmd.data.positionals.map((pos) => {
+                {cmd.positionals.map((pos) => {
                     let result =
                         pos.parameter_type === "rest"
                             ? "...rest"
@@ -180,19 +153,19 @@ const headings = [
     <hr />
     <footer>
         {
-            cmd.data.search_terms ? (
+            cmd.search_terms ? (
                 <p>
                     <b>Search Terms:</b>&nbsp;
-                    <span>{cmd.data.search_terms}</span>
+                    <span>{cmd.search_terms}</span>
                 </p>
             ) : (
                 <p>No search terms provided.</p>
             )
         }
         <p>
-            <b>Category:</b>&nbsp;
-            <a href={`/nu-docs/commands/#${categorySlug}`}>
-                {cmd.data.category}
+            <b>Module:</b>&nbsp;
+            <a href={`/nu-docs/stdlib/#${fullModuleSlug}`}>
+                {cmd.fullModule}
             </a>
         </p>
     </footer>
