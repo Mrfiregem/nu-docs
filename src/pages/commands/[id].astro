@@ -87,7 +87,7 @@ console.log(cmd);
 
     <AnchorHeading id="signature" level="2">Signature</AnchorHeading>
 
-    <Code code={cmd.data.sig_str} frame="none" />
+    <Code code={cmd.data.signature_string} frame="none" />
 
     <AnchorHeading id="input-output" level="3">
         Input / Output Types
@@ -95,7 +95,7 @@ console.log(cmd);
 
     <div class="input-output-list not-content">
         {
-            cmd.data.in_out_types.map(({ input, output }) => (
+            cmd.data.input_output_pairs.map(({ input, output }) => (
                 <>
                     <div class="input">{input}</div>
                     <div class="eq">&rarr;</div>

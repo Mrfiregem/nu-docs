@@ -7,6 +7,69 @@ import { execSync } from "node:child_process";
 import { parse as parse_json } from 'hjson';
 import slugify from '@sindresorhus/slugify';
 
+const signatureSchema = z.array(z.object({
+    parameter_name: z.string().nullish(),
+    parameter_type: z.enum(['input', 'output', 'positional', 'rest', 'named', 'switch']),
+    syntax_shape: z.string().nullable(),
+    is_optional: z.boolean(),
+    short_flag: z.string().length(1).nullable(),
+    description: z.string().nullable(),
+    parameter_default: z.any(),
+}));
+
+const commandSchema = z.object({
+    name: z.string(),
+    description: z.string(),
+    extra_description: z.string(),
+    search_terms: z.string(),
+    category: z.string().default("default"),
+    type: z.enum(['built-in', 'keyword', 'plugin', 'custom']),
+    signatures: z.record(z.string(), signatureSchema),
+    plugin_file: z.string().nullable(),
+    deprecated: z.boolean(),
+}).transform(data => ({
+    ...data,
+    library: null,
+    get id(): string { return slugify(data.name) },
+    get input_output_pairs() { return Object.values(data.signatures).map(pgroup => Object.fromEntries(pgroup.filter(param => ['input', 'output'].includes(param.parameter_type)).map(({ parameter_type, syntax_shape }) => [parameter_type, syntax_shape]))) },
+    get signature_string(): string {
+        const positional = Object.values(data.signatures)[0].map(p => {
+            switch (p.parameter_type) {
+                case 'positional': return `(${p.parameter_name})`;
+                case 'rest': return '...rest';
+                default: return null;
+            }
+        }).join(' ');
+        return [data.name, '{flags}', positional].filter(Boolean).join(' ');
+    },
+    get flags(): Signature {
+        return Object.values(data.signatures)[0].filter((param) => ['named', 'switch'].includes(param.parameter_type));
+    }
+}));
+
+type Signature = z.infer<typeof signatureSchema>;
+type Command = z.infer<typeof commandSchema>;
+
+const stdlibSchema = z.object({
+    /** Module name, e.g. `iter` */
+    module: z.string(),
+    /** Library name: `std` or `std-rfc` */
+    library: z.enum(['std', 'std-rfc']),
+    /** Path to the module, e.g. `std/iter/mod.nu` */
+    path: z.string(),
+    /** List of commands provided by module */
+    commands: z.array(commandSchema),
+    /** List of variables provided by module */
+    variables: z.array(z.object({
+        name: z.string(),
+        type: z.string(),
+        value: z.any(),
+        is_const: z.boolean(),
+    })),
+});
+
+type Stdlib = z.infer<typeof stdlibSchema>;
+
 export const collections = {
     docs: defineCollection({ loader: docsLoader(), schema: docsSchema() }),
     commands: defineCollection({
@@ -15,40 +78,29 @@ export const collections = {
                 encoding: 'utf-8', cwd: 'src/data', maxBuffer: 1024 * 1024 * 8
             });
             const data = parse_json(output);
-            return data.map((cmd: { [key: string]: any }) => ({
+            const result = data.map((cmd: Command) => ({
                 ...cmd,
                 id: slugify(cmd.name),
+                signature: Object.values(cmd.signatures)[0].filter((param) => ['input', 'output'].includes(param.parameter_type)),
+                input_output_pairs: Object.values(cmd.signatures).map(pgroup => Object.fromEntries(pgroup.filter(param => ['input', 'output'].includes(param.parameter_type)).map(({ parameter_type, syntax_shape }) => [parameter_type, syntax_shape]))),
+                get signature_string(): string {
+                    const positional = this.signature.map(p => {
+                        switch (p.parameter_type) {
+                            case 'positional': return `(${p.parameter_name})`;
+                            case 'rest': return '...rest';
+                            default: return null;
+                        }
+                    }).join(' ');
+                    return [this.name, '{flags}', positional].filter(Boolean).join(' ');
+                },
+                get flags(): Signature {
+                    return this.signature.filter((param) => ['named', 'switch'].includes(param.parameter_type));
+                }
             }));
+            console.log(result);
+            return result;
         },
-        schema: z.object({
-            id: z.string(),
-            name: z.string(),
-            description: z.string(),
-            extra_description: z.string(),
-            search_terms: z.string(),
-            category: z.string().default("default"),
-            type: z.string(),
-            sig_str: z.string(),
-            plugin_file: z.string().nullable(),
-            in_out_types: z.array(
-                z.object({
-                    input: z.string(),
-                    output: z.string(),
-                })
-            ),
-            flags: z.array(
-                z.object({
-                    parameter_name: z.string(),
-                    parameter_type: z.enum(['named', 'switch']),
-                    syntax_shape: z.string().nullish(),
-                    is_optional: z.boolean(),
-                    short_flag: z.string().length(1).nullish(),
-                    description: z.string(),
-                    parameter_default: z.string().nullish(),
-                })
-            ),
-            deprecated: z.boolean(),
-        }),
+        schema: commandSchema,
     }),
     stdlib: defineCollection({
         loader: () => {
@@ -56,20 +108,11 @@ export const collections = {
                 encoding: 'utf-8', cwd: 'src/data', maxBuffer: 1024 * 1024 * 8
             });
             const data = parse_json(output);
-            return data.map((lib: { [key: string]: any }) => ({
+            return data.map((lib: Stdlib) => ({
                 ...lib,
-                id: slugify(lib.library + '/' + lib.name),
+                id: slugify(lib.library + '-' + lib.module),
             }));
         },
-        schema: z.object({
-            id: z.string(),
-            library: z.string(),
-            name: z.string(),
-            commands: z.array(z.object({
-                name: z.string(),
-                description: z.string(),
-                extra_description: z.string(),
-            })),
-        }),
+        schema: stdlibSchema,
     }),
 };

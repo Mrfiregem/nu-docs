@@ -2,69 +2,78 @@
 import AnchorHeading from "@astrojs/starlight/components/AnchorHeading.astro";
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import slugify from "@sindresorhus/slugify";
+import type { MarkdownHeading } from "astro";
 import { getCollection } from "astro:content";
 
 const allLibs = await getCollection("stdlib");
 const sortedLibCmds = allLibs
-    .filter((lib) => lib.data.name !== lib.data.library)
     .flatMap((lib) =>
         lib.data.commands.map((cmd) => ({
-            id: slugify(lib.data.library + "-" + cmd.name),
-            data: {
-                ...cmd,
-                library: lib.data.library,
-                module: lib.data.name,
-                get fullModule(): string {
-                    return `${this.library}/${this.module}`;
-                },
-                get fullModuleSlug(): string {
-                    return slugify(this.fullModule);
-                },
-            },
+            ...cmd,
+            module: lib.data.module,
+            library: lib.data.library,
+            fullModule: lib.data.library + "/" + lib.data.module,
+            href_slug: slugify(lib.data.library + "-" + cmd.name),
+            id: slugify(lib.id + "-" + cmd.id),
         })),
     )
     .sort(
         (a, b) =>
-            a.data.library.localeCompare(b.data.library) ||
-            a.data.module.localeCompare(b.data.module) ||
-            a.data.name.localeCompare(b.data.name),
+            a.library.localeCompare(b.library) ||
+            a.module.localeCompare(b.module) ||
+            a.name.localeCompare(b.name),
     );
 ---
 
-<StarlightPage frontmatter={{ title: "Nushell Stdlib" }}>
+<StarlightPage
+    frontmatter={{ title: "Nushell Stdlib" }}
+    headings={sortedLibCmds
+        .map((cmd) => {
+            const heading: MarkdownHeading = {
+                depth: 2,
+                slug: slugify(cmd.fullModule),
+                text: cmd.fullModule,
+            };
+            return heading;
+        })
+        .filter(
+            (item, index, self) =>
+                index === self.findIndex((t) => t.slug === item.slug),
+        )}
+>
     <div id="stdlib-list" class="not-content">
         {
             sortedLibCmds.map((cmd, index) => {
                 const isNewLibrary =
-                    cmd.data.library !== sortedLibCmds[index - 1]?.data.library;
+                    cmd.library !== sortedLibCmds[index - 1]?.library;
                 const isNewModule =
-                    cmd.data.module !== sortedLibCmds[index - 1]?.data.module;
+                    cmd.module !== sortedLibCmds[index - 1]?.module;
                 return (
                     <Fragment key={cmd.id}>
                         {isNewLibrary && (
                             <AnchorHeading
                                 class="span-cols"
                                 level="2"
-                                id={cmd.data.library}
+                                id={slugify(cmd.library)}
                             >
-                                {cmd.data.library}
+                                {cmd.library}
                             </AnchorHeading>
                         )}
                         {isNewModule && (
                             <AnchorHeading
                                 class="span-cols"
                                 level="3"
-                                id={cmd.data.fullModuleSlug}
+                                id={slugify(cmd.fullModule)}
                             >
-                                {cmd.data.fullModule}
+                                {cmd.fullModule}
                             </AnchorHeading>
                         )}
                         <div class="cmd-name">
-                            <a href={`/nu-docs/stdlib/${cmd.id}`}>
-                                {cmd.data.name}
+                            <a href={`/nu-docs/stdlib/${cmd.href_slug}`}>
+                                {cmd.name}
                             </a>
                         </div>
-                        <div class="cmd-desc">{cmd.data.description}</div>
+                        <div class="cmd-desc">{cmd.description}</div>
                     </Fragment>
                 );
             })
