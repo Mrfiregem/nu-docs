@@ -21,21 +21,10 @@ const { cmd } = Astro.props;
 const categorySlug = slugify(cmd.data.category);
 
 const headings = [
-    {
-        depth: 2,
-        slug: "signature",
-        text: "Signature",
-    },
-    {
-        depth: 3,
-        slug: "input-output",
-        text: "Input / Output Types",
-    },
-    {
-        depth: 3,
-        slug: "flags",
-        text: "Command Flags",
-    },
+    { depth: 2, slug: "signature", text: "Signature" },
+    { depth: 3, slug: "input-output", text: "Input / Output Types" },
+    { depth: 3, slug: "flags", text: "Command Flags" },
+    { depth: 3, slug: "positionals", text: "Positional Arguments" },
 ];
 
 console.log(cmd);
@@ -152,7 +141,41 @@ console.log(cmd);
                 )}
             </dl>
         ) : (
-            <p>This command does not have any flags defined.</p>
+            <p>This command does not accept any flags.</p>
+        )
+    }
+
+    <AnchorHeading id="positionals" level="3"
+        >Positional Arguments</AnchorHeading
+    >
+
+    {
+        cmd.data.positionals.length > 0 ? (
+            <dl>
+                {cmd.data.positionals.map((pos) => {
+                    let result =
+                        pos.parameter_type === "rest"
+                            ? "...rest"
+                            : (pos.parameter_name ?? "positional");
+                    result += `: ${pos.syntax_shape}`;
+                    if (pos.parameter_default) {
+                        result += ` = ${pos.parameter_default}`;
+                    }
+                    return (
+                        <>
+                            <dt class="pos-key">
+                                {result}
+                                {pos.is_optional && (
+                                    <Badge text="Optional" variant="note" />
+                                )}
+                            </dt>
+                            <dd>{pos.description}</dd>
+                        </>
+                    );
+                })}
+            </dl>
+        ) : (
+            <p>This command does not accept any positional arguments.</p>
         )
     }
 
@@ -195,7 +218,8 @@ console.log(cmd);
         }
     }
 
-    .flag-key {
+    .flag-key,
+    .pos-key {
         display: flex;
         gap: 1ch;
         align-items: baseline;

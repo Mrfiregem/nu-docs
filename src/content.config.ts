@@ -31,7 +31,13 @@ const commandSchema = z.object({
     ...data,
     library: null,
     get id(): string { return slugify(data.name) },
-    get input_output_pairs() { return Object.values(data.signatures).map(pgroup => Object.fromEntries(pgroup.filter(param => ['input', 'output'].includes(param.parameter_type)).map(({ parameter_type, syntax_shape }) => [parameter_type, syntax_shape]))) },
+    get input_output_pairs() {
+        return Object.values(data.signatures).map(pgroup => Object
+            .fromEntries(pgroup
+                .filter(param => ['input', 'output'].includes(param.parameter_type))
+                .map(({ parameter_type, syntax_shape }) => [parameter_type, syntax_shape]))
+        )
+    },
     get signature_string(): string {
         const positional = Object.values(data.signatures)[0].map(p => {
             switch (p.parameter_type) {
@@ -39,11 +45,16 @@ const commandSchema = z.object({
                 case 'rest': return '...rest';
                 default: return null;
             }
-        }).join(' ');
+        }).filter(Boolean).join(' ');
         return [data.name, '{flags}', positional].filter(Boolean).join(' ');
     },
     get flags(): Signature {
-        return Object.values(data.signatures)[0].filter((param) => ['named', 'switch'].includes(param.parameter_type));
+        return Object.values(data.signatures)[0]
+            .filter((param) => ['named', 'switch'].includes(param.parameter_type));
+    },
+    get positionals(): Signature {
+        return Object.values(data.signatures)[0]
+            .filter(param => ['positional', 'rest'].includes(param.parameter_type));
     }
 }));
 
