@@ -64,7 +64,7 @@ const commandSchema = z.object({
 }));
 
 type Signature = z.infer<typeof signatureSchema>;
-type Command = z.infer<typeof commandSchema>;
+export type Command = z.infer<typeof commandSchema>;
 
 const stdlibSchema = z.object({
     /** Module name, e.g. `iter` */

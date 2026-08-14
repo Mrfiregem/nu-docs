@@ -1,0 +1,225 @@
+---
+import linkifyHtml from "linkify-html";
+
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import AnchorHeading from "@astrojs/starlight/components/AnchorHeading.astro";
+
+import { Aside, Badge, Code } from "@astrojs/starlight/components";
+import type { Command } from "../content.config";
+
+interface Props {
+    cmd: Command;
+    backlinkSlug: string;
+}
+
+const { cmd, backlinkSlug } = Astro.props;
+
+const headings = [
+    { depth: 2, slug: "signature", text: "Signature" },
+    { depth: 3, slug: "input-output", text: "Input / Output Types" },
+    { depth: 3, slug: "flags", text: "Command Flags" },
+    { depth: 3, slug: "positionals", text: "Positional Arguments" },
+    { depth: 2, slug: "examples", text: "Examples" },
+];
+---
+
+<StarlightPage frontmatter={{ title: cmd.name }} headings={headings}>
+    <p>{cmd.description}</p>
+
+    {
+        cmd.deprecated && (
+            <Aside type="danger" title="Deprecated Command">
+                This command will stop working in a future version of Nushell.
+            </Aside>
+        )
+    }
+
+    {
+        cmd.type === "plugin" && (
+            <Aside type="note" title="Plugin Command">
+                <p>
+                    This command is provided by an official Nushell plugin and
+                    will only work if you've previously run the following
+                    command with the correct plugin name:
+                </p>
+                <Code
+                    code={`plugin add ${cmd.plugin_file || "nu_plugin_{name}"}`}
+                    lang="nushell"
+                    mark="nu_plugin_{name}"
+                />
+            </Aside>
+        )
+    }
+
+    {
+        cmd.extra_description && (
+            <>
+                <hr />
+                <div id="extra_desc">
+                    {/* Split extra description into sentences separated by newlines and punctuation */}
+                    {cmd.extra_description.split(/\r?\n/).map((sentence) => (
+                        <p set:html={linkifyHtml(sentence)} />
+                    ))}
+                </div>
+            </>
+        )
+    }
+
+    <AnchorHeading id="signature" level="2">Signature</AnchorHeading>
+
+    <Code code={cmd.signature_string} frame="none" />
+
+    <AnchorHeading id="input-output" level="3">
+        Input / Output Types
+    </AnchorHeading>
+
+    <div class="input-output-list not-content">
+        {
+            cmd.input_output_pairs.map(({ input, output }) => (
+                <>
+                    <div class="input">{input}</div>
+                    <div class="eq">&rarr;</div>
+                    <div class="output">{output}</div>
+                </>
+            ))
+        }
+    </div>
+
+    <AnchorHeading id="flags" level="3">Command Flags</AnchorHeading>
+
+    {
+        cmd.flags.length > 0 ? (
+            <dl id="flag-list">
+                {cmd.flags.map(
+                    ({
+                        parameter_name: name,
+                        parameter_type: type,
+                        description,
+                        is_optional: opt,
+                        short_flag,
+                        syntax_shape,
+                        parameter_default: default_val,
+                    }) => {
+                        let result = `--${name}`;
+                        if (short_flag) {
+                            result = `-${short_flag}, ${result}`;
+                        }
+                        if (type == "named") {
+                            result += `: ${syntax_shape}`;
+                        }
+                        if (default_val) {
+                            result += ` = ${default_val}`;
+                        }
+                        return (
+                            <>
+                                <dt class="flag-key">
+                                    {result}
+                                    {opt && syntax_shape ? (
+                                        <Badge text="Optional" variant="note" />
+                                    ) : (
+                                        opt && (
+                                            <Badge
+                                                text="Switch"
+                                                variant="note"
+                                            />
+                                        )
+                                    )}
+                                </dt>
+                                <dd class="flag-val">{description}</dd>
+                            </>
+                        );
+                    },
+                )}
+            </dl>
+        ) : (
+            <p>This command does not accept any flags.</p>
+        )
+    }
+
+    <AnchorHeading id="positionals" level="3">
+        Positional Arguments
+    </AnchorHeading>
+
+    {
+        cmd.positionals.length > 0 ? (
+            <dl>
+                {cmd.positionals.map((pos) => {
+                    let result =
+                        pos.parameter_type === "rest"
+                            ? "...rest"
+                            : (pos.parameter_name ?? "positional");
+                    result += `: ${pos.syntax_shape}`;
+                    if (pos.parameter_default) {
+                        result += ` = ${pos.parameter_default}`;
+                    }
+                    return (
+                        <>
+                            <dt class="pos-key">
+                                {result}
+                                {pos.is_optional && (
+                                    <Badge text="Optional" variant="note" />
+                                )}
+                            </dt>
+                            <dd>{pos.description}</dd>
+                        </>
+                    );
+                })}
+            </dl>
+        ) : (
+            <p>This command does not accept any positional arguments.</p>
+        )
+    }
+
+    <hr />
+    <footer>
+        {
+            cmd.search_terms ? (
+                <p>
+                    <b>Search Terms:</b>&nbsp;
+                    <span>{cmd.search_terms}</span>
+                </p>
+            ) : (
+                <p>No search terms provided.</p>
+            )
+        }
+        <p>
+            <b>Category:</b>&nbsp;
+            <a href={`/nu-docs/commands/#${backlinkSlug}`}>
+                {cmd.category}
+            </a>
+        </p>
+    </footer>
+</StarlightPage>
+
+<style>
+    .input-output-list {
+        --columns: 1;
+        display: grid;
+        grid-template-columns: repeat(var(--columns), max-content auto 1fr);
+        gap: 0 2ch;
+        .input::before {
+            content: "\2022 ";
+            margin-inline-end: 1ch;
+        }
+    }
+
+    @container --sl-container (width > 480) {
+        .input-output-list {
+            --columns: 2;
+        }
+    }
+
+    .flag-key,
+    .pos-key {
+        display: flex;
+        gap: 1ch;
+        align-items: baseline;
+    }
+
+    footer {
+        display: flex;
+        align-items: baseline;
+        column-gap: 2em;
+        flex-wrap: wrap;
+    }
+</style>
