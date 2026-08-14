@@ -29,15 +29,18 @@ const commandSchema = z.object({
     deprecated: z.boolean(),
 }).transform(data => ({
     ...data,
-    library: null,
+    /** Unique ID to identify command, used in links */
     get id(): string { return slugify(data.name) },
+    /** List of `{input, output}` pairs the command supports */
     get input_output_pairs() {
         return Object.values(data.signatures).map(pgroup => Object
-            .fromEntries(pgroup
-                .filter(param => ['input', 'output'].includes(param.parameter_type))
-                .map(({ parameter_type, syntax_shape }) => [parameter_type, syntax_shape]))
-        )
+            .fromEntries(
+                pgroup
+                    .filter(param => ['input', 'output'].includes(param.parameter_type))
+                    .map(({ parameter_type, syntax_shape }) => [parameter_type, syntax_shape ?? 'switch'])
+            ) as { input: string, output: string })
     },
+    /** The short signature overview, e.g. `ls {flags} ...rest` */
     get signature_string(): string {
         const positional = Object.values(data.signatures)[0].map(p => {
             switch (p.parameter_type) {
@@ -48,10 +51,12 @@ const commandSchema = z.object({
         }).filter(Boolean).join(' ');
         return [data.name, '{flags}', positional].filter(Boolean).join(' ');
     },
+    /** The signature filtered to just boolean switches and flags taking values */
     get flags(): Signature {
         return Object.values(data.signatures)[0]
             .filter((param) => ['named', 'switch'].includes(param.parameter_type));
     },
+    /** The signature filtered to just positional arguments and an optional rest argument */
     get positionals(): Signature {
         return Object.values(data.signatures)[0]
             .filter(param => ['positional', 'rest'].includes(param.parameter_type));
